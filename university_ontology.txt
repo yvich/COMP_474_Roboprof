@@ -1,0 +1,251 @@
+{
+  "nbformat": 4,
+  "nbformat_minor": 0,
+  "metadata": {
+    "colab": {
+      "provenance": []
+    },
+    "kernelspec": {
+      "name": "python3",
+      "display_name": "Python 3"
+    },
+    "language_info": {
+      "name": "python"
+    }
+  },
+  "cells": [
+    {
+      "cell_type": "code",
+      "execution_count": 2,
+      "metadata": {
+        "colab": {
+          "base_uri": "https://localhost:8080/"
+        },
+        "id": "L_6SYY40UfDl",
+        "outputId": "ff475221-c6b0-438b-8b54-fa9214673945"
+      },
+      "outputs": [
+        {
+          "output_type": "stream",
+          "name": "stdout",
+          "text": [
+            "Collecting rdflib\n",
+            "  Downloading rdflib-7.0.0-py3-none-any.whl (531 kB)\n",
+            "\u001b[2K     \u001b[90m━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\u001b[0m \u001b[32m531.9/531.9 kB\u001b[0m \u001b[31m3.3 MB/s\u001b[0m eta \u001b[36m0:00:00\u001b[0m\n",
+            "\u001b[?25hCollecting isodate<0.7.0,>=0.6.0 (from rdflib)\n",
+            "  Downloading isodate-0.6.1-py2.py3-none-any.whl (41 kB)\n",
+            "\u001b[2K     \u001b[90m━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\u001b[0m \u001b[32m41.7/41.7 kB\u001b[0m \u001b[31m6.4 MB/s\u001b[0m eta \u001b[36m0:00:00\u001b[0m\n",
+            "\u001b[?25hRequirement already satisfied: pyparsing<4,>=2.1.0 in /usr/local/lib/python3.10/dist-packages (from rdflib) (3.1.2)\n",
+            "Requirement already satisfied: six in /usr/local/lib/python3.10/dist-packages (from isodate<0.7.0,>=0.6.0->rdflib) (1.16.0)\n",
+            "Installing collected packages: isodate, rdflib\n",
+            "Successfully installed isodate-0.6.1 rdflib-7.0.0\n"
+          ]
+        }
+      ],
+      "source": [
+        "pip install rdflib"
+      ]
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "from rdflib import Graph, URIRef, Literal, RDFS, Namespace\n",
+        "\n",
+        "# Define namespaces\n",
+        "foaf = Namespace(\"http://xmlns.com/foaf/0.1/\")\n",
+        "vcard = Namespace(\"http://www.w3.org/2006/vcard/ns#\")\n",
+        "university = Namespace(\"http://example.org/university/\")\n",
+        "course = Namespace(\"http://example.org/course/\")\n",
+        "lecture = Namespace(\"http://example.org/lecture/\")\n",
+        "topic = Namespace(\"http://example.org/topic/\")\n",
+        "student = Namespace(\"http://example.org/student/\")\n",
+        "\n",
+        "# Create a graph\n",
+        "g = Graph()\n"
+      ],
+      "metadata": {
+        "id": "j4suOtPNUp7O"
+      },
+      "execution_count": 3,
+      "outputs": []
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "# Define classes\n",
+        "g.add((course.NAMESPACE, RDFS.subClassOf, foaf.Course))\n",
+        "g.add((lecture.NAMESPACE, RDFS.subClassOf, course.hasPart))\n",
+        "\n",
+        "# Subclass hierarchy for lecture content types\n",
+        "g.add((lecture.content, RDFS.subClassOf, RDFS.Literal))\n",
+        "g.add((lecture.Slide, RDFS.subClassOf, lecture.content))\n",
+        "g.add((lecture.Worksheet, RDFS.subClassOf, lecture.content))\n",
+        "g.add((lecture.Reading, RDFS.subClassOf, lecture.content))\n",
+        "g.add((lecture.OtherMaterial, RDFS.subClassOf, lecture.content))"
+      ],
+      "metadata": {
+        "colab": {
+          "base_uri": "https://localhost:8080/"
+        },
+        "id": "-PP6I_OMUzXY",
+        "outputId": "ccf41add-f315-4535-bdd4-67fc6d51fcd2"
+      },
+      "execution_count": 4,
+      "outputs": [
+        {
+          "output_type": "execute_result",
+          "data": {
+            "text/plain": [
+              "<Graph identifier=N844409af2b0e43cb87f4b9fb6a3d2ab1 (<class 'rdflib.graph.Graph'>)>"
+            ]
+          },
+          "metadata": {},
+          "execution_count": 4
+        }
+      ]
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "# Define properties with labels and comments\n",
+        "g.add((course.name, RDFS.label, Literal(\"Course Name\")))\n",
+        "g.add((course.name, RDFS.comment, Literal(\"The official name of the course.\")))\n",
+        "g.add((course.dbpedia, RDFS.label, Literal(\"DBpedia Link\")))\n",
+        "g.add((course.dbpedia, RDFS.comment, Literal(\"Link to the course entry in DBpedia.\")))\n",
+        "g.add((course.wikidata, RDFS.label, Literal(\"Wikidata Link\")))\n",
+        "g.add((course.wikidata, RDFS.comment, Literal(\"Link to the course entry in Wikidata.\")))\n",
+        "\n",
+        "# ... (other property definitions remain the same)\n",
+        "\n",
+        "# Student information\n",
+        "g.add((student.NAMESPACE, RDFS.label, Literal(\"Student\")))\n",
+        "g.add((student.NAMESPACE, RDFS.comment, Literal(\"Information about a student.\")))\n",
+        "\n",
+        "# Properties for student information\n",
+        "firstName = student.firstName\n",
+        "lastName = student.lastName\n",
+        "studentId = student.id\n",
+        "email = student.email\n",
+        "hasCompletedCourse = student.hasCompletedCourse\n",
+        "courseGrade = course.hasGrade\n",
+        "isCompetentIn = student.isCompetentIn"
+      ],
+      "metadata": {
+        "id": "fBm9UWmaU5W0"
+      },
+      "execution_count": 5,
+      "outputs": []
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "# Example data (replace with actual data)\n",
+        "university1 = URIRef(\"http://example.org/university/MIT\")\n",
+        "course1 = URIRef(\"http://example.org/course/COMP474\")\n",
+        "course2 = URIRef(\"http://example.org/course/ECON111\")\n",
+        "lecture1 = URIRef(\"http://example.org/lecture/1\")\n",
+        "topic1 = URIRef(\"http://example.org/topic/KnowledgeGraphs\")\n",
+        "student1 = URIRef(\"http://example.org/student/AliceSmith\")\n",
+        "student2 = URIRef(\"http://example.org/student/AliModu\")"
+      ],
+      "metadata": {
+        "id": "8Zx4Rj2iVIx-"
+      },
+      "execution_count": 9,
+      "outputs": []
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "# Populate the graph (replace with actual data)\n",
+        "g.add((university1, foaf.name, Literal(\"Massachusetts Institute of Technology\")))\n",
+        "g.add((course1, RDFS.label, Literal(\"Intelligent Systems\")))\n",
+        "g.add((course1, course.hasSubject, Literal(\"COMP\")))\n",
+        "g.add((course1, course.number, Literal(\"474\")))\n",
+        "g.add((course1, course.offeredBy, university1))\n",
+        "\n",
+        "g.add((university1, foaf.name, Literal(\"Massachusetts Institute of Technology\")))\n",
+        "g.add((course2, RDFS.label, Literal(\"Economics\")))\n",
+        "g.add((course2, course.hasSubject, Literal(\"ECON\")))\n",
+        "g.add((course2, course.number, Literal(\"111\")))\n",
+        "g.add((course2, course.offeredBy, university1))\n",
+        "# ... (add other course information: description, credits, seeAlso, outline)\n",
+        "\n",
+        "g.add((lecture1, lecture.hasOrder, Literal(1)))  # Lecture number\n",
+        "g.add((lecture1, lecture.name, Literal(\"Knowledge Representation\")))\n",
+        "g.add((lecture1, lecture.isPartOf, course1))\n",
+        "# ... (add lecture content: slides, readings, etc.)\n",
+        "\n",
+        "g.add((topic1, RDFS.label, Literal(\"Knowledge Graphs\")))\n",
+        "g.add((topic1, topic.inCourse, course1))\n",
+        "g.add((topic1, topic.inLecture, lecture1))  # Provenance information\n",
+        "g.add((topic1, topic.dbpedia, URIRef(\"https://dbpedia.org/resource/Knowledge_graph\")))\n",
+        "# ... (add other topic information)\n",
+        "\n",
+        "g.add((student1, foaf.firstName, Literal(\"Alice\")))\n",
+        "g.add((student1, foaf.lastName, Literal(\"Smith\")))\n",
+        "g.add((student1, student.id, Literal(\"12345\")))\n",
+        "g.add((student1, vcard.email, Literal(\"alice.smith@example.com\")))\n",
+        "g.add((student1, student.hasCompletedCourse, course1))\n",
+        "g.add((course1, course.hasGrade, Literal(\"A\")))  # Student's grade\n",
+        "\n",
+        "g.add((student2, foaf.firstName, Literal(\"Ali\")))\n",
+        "g.add((student2, foaf.lastName, Literal(\"Modu\")))\n",
+        "g.add((student2, student.id, Literal(\"11255\")))\n",
+        "g.add((student2, vcard.email, Literal(\"ali.modu@example.com\")))\n",
+        "g.add((student2, student.hasCompletedCourse, course1))\n",
+        "g.add((student2, student.hasCompletedCourse, course2))\n",
+        "g.add((course1, course.hasGrade, Literal(\"B\")))  # Student's grade\n",
+        "g.add((course2, course.hasGrade, Literal(\"C\")))  # Student's grade\n",
+        "# ... (add information for other students and courses)\n"
+      ],
+      "metadata": {
+        "colab": {
+          "base_uri": "https://localhost:8080/"
+        },
+        "id": "qYx4EpnWVJ7K",
+        "outputId": "76327d39-fe55-400f-cf0e-3c7bb035e563"
+      },
+      "execution_count": 12,
+      "outputs": [
+        {
+          "output_type": "execute_result",
+          "data": {
+            "text/plain": [
+              "<Graph identifier=N844409af2b0e43cb87f4b9fb6a3d2ab1 (<class 'rdflib.graph.Graph'>)>"
+            ]
+          },
+          "metadata": {},
+          "execution_count": 12
+        }
+      ]
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "# Save the graph in Turtle format\n",
+        "with open(\"university.ttl\", \"wb\") as f:\n",
+        "    g.serialize(f, format=\"turtle\")\n",
+        "\n",
+        "print(\"University information saved in university.ttl\")"
+      ],
+      "metadata": {
+        "colab": {
+          "base_uri": "https://localhost:8080/"
+        },
+        "id": "hK6N73HFVY3Q",
+        "outputId": "3690dbb9-851b-43af-f85c-e10184057b7c"
+      },
+      "execution_count": 13,
+      "outputs": [
+        {
+          "output_type": "stream",
+          "name": "stdout",
+          "text": [
+            "University information saved in university.ttl\n"
+          ]
+        }
+      ]
+    }
+  ]
+}
